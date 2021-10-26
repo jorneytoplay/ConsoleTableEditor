@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Lombok;
 
 import static com.example.dbdemo.Constants.PersonConstants.PersonSQL.*;
 
