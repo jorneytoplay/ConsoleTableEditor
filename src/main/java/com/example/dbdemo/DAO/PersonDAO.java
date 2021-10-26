@@ -10,7 +10,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonDAO<T> implements GenericDAO<T>{
+import static com.example.dbdemo.Constants.PersonConstants.PersonSQL.*;
+
+public class PersonDAO<T> implements GenericDAO<T> {
     public Connection connection;
 
     @Autowired
@@ -18,27 +20,54 @@ public class PersonDAO<T> implements GenericDAO<T>{
         this.connection = connection;
     }
 
-
+    //TODO
     @Override
     public T create() {
         return null;
     }
 
-    @Override
-    public T getByParam(String comm, T param) {
+    public T getById(T param) {
 
-        String sql = "SELECT * FROM gamers WHERE "+comm+ "= ?";
-        Person person = new Person();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_BY_ID)) {
             statement.setInt(1, (Integer) param);
-            System.out.println(statement);
             ResultSet rs = statement.executeQuery();
             rs.next();
-            person = fillPersonFields(rs);
+            Person person = fillPersonFields(rs);
+            return (T) person;
         } catch (Exception e) {
             System.out.println(e);
         }
-        return (T) person;
+        return (T) "Sorry not found user";
+    }
+
+    public List getByAge(T param) {
+        List<Person> list = new ArrayList<Person>();
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_BY_AGE)) {
+            statement.setInt(1, (Integer) param);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Person person = fillPersonFields(rs);
+                list.add(person);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
+    }
+
+    public List getByNickname(T param) {
+        List<Person> list = new ArrayList<Person>();
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_BY_NICKNAME)) {
+            statement.setString(1, (String) param);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Person person = fillPersonFields(rs);
+                list.add(person);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
     }
 
     @Override
@@ -51,15 +80,13 @@ public class PersonDAO<T> implements GenericDAO<T>{
 
     }
 
-
     @Override
     public List getAll() {
-        String sql = "SELECT * FROM gamers";
         List<Person> list = new ArrayList<Person>();
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        try (PreparedStatement stm = connection.prepareStatement(FIND_ALL)) {
             ResultSet rs = stm.executeQuery();
             while (rs.next()) {
-                    Person s = new Person();
+                Person s = new Person();
                 s.setId(rs.getInt("id"));
                 s.setNickname(rs.getString("nickname"));
                 s.setAge(rs.getInt("age"));
@@ -70,6 +97,7 @@ public class PersonDAO<T> implements GenericDAO<T>{
         }
         return list;
     }
+
     private Person fillPersonFields(ResultSet resultSet) throws SQLException {
         Person person = new Person();
         person.setId(resultSet.getInt("id"));

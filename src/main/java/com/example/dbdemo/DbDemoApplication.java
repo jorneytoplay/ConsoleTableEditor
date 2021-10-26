@@ -13,14 +13,12 @@ public class DbDemoApplication {
         SpringApplication.run(DbDemoApplication.class, args);
         DataBaseControl dbs = new DataBaseControl();
         DataBasePanel dbp = new DataBasePanel(dbs.getNewConnection());
-            try {
-                dbp.start();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+        try {
+            dbp.start();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-
-
+    }
 
 
 }
