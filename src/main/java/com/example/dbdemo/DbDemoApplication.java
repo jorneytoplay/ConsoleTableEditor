@@ -9,16 +9,7 @@ import java.sql.SQLException;
 @SpringBootApplication
 public class DbDemoApplication {
 
-    public static void main(String[] args) throws SQLException {
-        SpringApplication.run(DbDemoApplication.class, args);
-        DataBaseControl dbs = new DataBaseControl();
-        DataBasePanel dbp = new DataBasePanel(dbs.getNewConnection());
-        try {
-            dbp.start();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
+    public static void main(String[] args){ SpringApplication.run(DbDemoApplication.class, args); }
 
 
 }
