@@ -13,7 +13,7 @@ public class Person {
     int id = 0;
     String nickname;
     int age = 0;
-
+    int game=0;
 
 
     @Override

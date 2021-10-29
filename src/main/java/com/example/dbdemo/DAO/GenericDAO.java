@@ -3,12 +3,12 @@ package com.example.dbdemo.DAO;
 import java.util.List;
 
 public interface GenericDAO<T> {
-    T create();
+    T insert(T first,T second, T third);
 
     // T getByParam(String comm, T param);
-    void update(T param);
+    boolean update(T id,T first,T second);
 
-    void delete(T param);
+    boolean delete(T param);
     List<T> getAll();
 
 }

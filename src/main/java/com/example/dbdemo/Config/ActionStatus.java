@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Data
-public class SelectStatus {
+public class ActionStatus {
     boolean connected;
     boolean paramMode;
+    String table=null;
+    boolean tableSelect;
 }
