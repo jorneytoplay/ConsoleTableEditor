@@ -17,6 +17,7 @@ public class ConnectionToDB {
     @ShellMethod("Connection to data base.")
     public void connect(){
      actionStatus.setConnected(true);
+        System.out.println("Table list:\n1.gamers\n2.game\nPlease enter in console command 'table (number of table)'");
     }
 
 
