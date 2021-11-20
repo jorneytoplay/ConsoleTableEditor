@@ -2,6 +2,7 @@ package com.example.dbdemo.Shell;
 
 import com.example.dbdemo.Config.ActionStatus;
 import com.example.dbdemo.DAO.PersonDAO;
+import com.example.dbdemo.DAO.PersonDAOHib;
 import com.example.dbdemo.Entity.Person;
 import com.example.dbdemo.TableInfo;
 import org.jline.utils.AttributedString;
@@ -13,11 +14,11 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
-
-
+import org.apache.log4j.Logger;
 
 
 /**
@@ -33,10 +34,13 @@ public class SelectCommand {
      * PersonDAO - abstract interface for working with the table of users (gamers)
      */
     Connection connection;
+    PersonDAOHib pdh = new PersonDAOHib();
     ActionStatus actionStatus;
     Scanner sc = new Scanner(System.in);
     TableInfo tableInfo;
     PersonDAO personDAO;
+    private static final Logger logger = Logger.getLogger(
+            SelectCommand.class);
 
     @Autowired
     public SelectCommand(Connection connection, ActionStatus actionStatus) {
@@ -44,7 +48,7 @@ public class SelectCommand {
         tableInfo = new TableInfo(connection);
         personDAO = new PersonDAO(connection);
         this.actionStatus = actionStatus;
-    }
+        }
 
     /**
      * This method modifies the console and creates a trigger that responds to table selection.
@@ -117,34 +121,43 @@ public class SelectCommand {
     public void update(){
         int choose;
         int id;
-        System.out.println("Enter user ID:");
-        id=sc.nextInt();
-        System.out.println("What would you like to update?(Select request number)\n1.nickname\n2.age\n3.game");
-        choose=sc.nextInt();
-        while (true) {
+        try {
+            System.out.println("Enter user ID:");
+            id=sc.nextInt();
+            System.out.println("What would you like to update?(Select request number)\n1.nickname\n2.age\n3.game");
+            choose=sc.nextInt();
+            while (true) {
 
-        if(choose==1) {
-            System.out.println("Enter any nickname:");
-            String nickname = sc.next();
-            resultChecker(personDAO.update(id,"nickname",nickname),"update");
-            return;
-        }
-        else if(choose==2){
-            System.out.println("Enter any age:");
-            int age=sc.nextInt();
-            resultChecker(personDAO.update(id,"age",age),"update");
-            return;
+                if(choose==1) {
+                    System.out.println("Enter any nickname:");
+                    String nickname = sc.next();
+                    resultChecker(personDAO.update(id,"nickname",nickname),"update");
+                    logger.info("Update complete");
+                    return;
+                }
+                else if(choose==2){
+                    System.out.println("Enter any age:");
+                    int age=sc.nextInt();
+                    resultChecker(personDAO.update(id,"age",age),"update");
+                    logger.info("Update complete");
+                    return;
+                }
+                else if(choose==3){
+                    System.out.println("Enter any game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
+                    int game=sc.nextInt();
+                    resultChecker(personDAO.update(id,"game",game),"update");
+                    logger.info("Update complete");
+                    return;
+                }
+                else {
+                    System.out.println("Request is invalid");
+                }
             }
-        else if(choose==3){
-            System.out.println("Enter any game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
-            int game=sc.nextInt();
-            resultChecker(personDAO.update(id,"game",game),"update");
-            return;
         }
-        else {
-            System.out.println("Request is invalid");
+        catch (Exception e){
+            e.getMessage();
         }
-        }
+
 
     }
 
@@ -154,10 +167,17 @@ public class SelectCommand {
      */
     @ShellMethod("Selection find all")
     public void findAll() {
-        List<Person> personList = personDAO.getAll();
-        for (Person gamer : personList) {
-            System.out.println(gamer);
+        try {
+            List<Person> personList = personDAO.getAll();
+            for (Person gamer : personList) {
+                System.out.println(gamer);
+            }
+            logger.info("FindAll complete");
         }
+        catch (Exception e){
+            e.getMessage();
+        }
+
     }
 
     /**
@@ -169,14 +189,21 @@ public class SelectCommand {
      */
     @ShellMethod("Selection find by parameter")
     public void findParam() {
-        actionStatus.setParamMode(true);
-        List<String> columns = tableInfo.columnList(actionStatus.getTable());
-        int count = 1;
-        for (String column : columns) {
-            System.out.println(count + "." + column);
-            ++count;
+        try {
+            actionStatus.setParamMode(true);
+            List<String> columns = tableInfo.columnList(actionStatus.getTable());
+            int count = 1;
+            for (String column : columns) {
+                System.out.println(count + "." + column);
+                ++count;
+            }
+            param(count);
+            logger.info("Find-param complete");
         }
-        param(count);
+        catch (Exception e){
+            e.getMessage();
+        }
+
     }
 
     /**
@@ -189,15 +216,22 @@ public class SelectCommand {
         String nickname;
         int age;
         int game;
-        if(actionStatus.getTable().equals("gamers")){
-            System.out.println("Enter gamer information\nEnter nickname:");
-            nickname=sc.nextLine();
-            System.out.println("Enter age:");
-            age=sc.nextInt();
-            System.out.println("Enter game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
-            game=sc.nextInt();
-            System.out.println(personDAO.insert(nickname,age,game));
+        try {
+            if(actionStatus.getTable().equals("gamers")){
+                System.out.println("Enter gamer information\nEnter nickname:");
+                nickname=sc.nextLine();
+                System.out.println("Enter age:");
+                age=sc.nextInt();
+                System.out.println("Enter game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
+                game=sc.nextInt();
+                System.out.println(personDAO.insert(nickname,age,game));
+            }
+            logger.info("Insert complete");
         }
+        catch (Exception e){
+            e.getMessage();
+        }
+
     }
 
     /**
@@ -208,11 +242,18 @@ public class SelectCommand {
     @ShellMethod("Delete data")
     public void delete() {
         int id;
-        if (actionStatus.getTable().equals("gamers")) {
-            System.out.println("Please enter id:");
-            id = sc.nextInt();
-            resultChecker(personDAO.delete(id),"delete");
+        try {
+            if (actionStatus.getTable().equals("gamers")) {
+                System.out.println("Please enter id:");
+                id = sc.nextInt();
+                resultChecker(personDAO.delete(id),"delete");
+            }
+            logger.info("Delete complete");
         }
+        catch (Exception e){
+            e.getMessage();
+        }
+
     }
 
     /**
@@ -221,36 +262,44 @@ public class SelectCommand {
 
     public void param(int count) {
         int chooseInt = 0;
-        while (true){
-            chooseInt=sc.nextInt();
-            if(chooseInt>0 && chooseInt<count){
-                break;
+        try {
+            while (true){
+                chooseInt=sc.nextInt();
+                if(chooseInt>0 && chooseInt<count){
+                    break;
+                }
             }
+            List<Person> personList;
+            String chooseStr;
+            switch (chooseInt) {
+                case 1:
+                    System.out.println("Please enter id:");
+                    chooseInt = sc.nextInt();
+                    System.out.println(pdh.findById(chooseInt));
+                case 2:
+                    System.out.println("Please enter nickname:");
+                    chooseStr = sc.next();
+                    personList = personDAO.getByNickname(chooseStr);
+                    for (Person gamer : personList) {
+                        System.out.println(gamer);
+                    }
+                case 3:
+                    System.out.println("Please enter age:");
+                    chooseInt = sc.nextInt();
+                    personList = personDAO.getByAge(chooseInt);
+                    for (Person gamer : personList) {
+                        System.out.println(gamer);
+                    }
+                default:
+                    actionStatus.setParamMode(false);
+            }
+            logger.info("Find by param complete");
         }
-        List<Person> personList;
-        String chooseStr;
-        switch (chooseInt) {
-            case 1:
-                System.out.println("Please enter id:");
-                chooseInt = sc.nextInt();
-                System.out.println(personDAO.getById(chooseInt));
-            case 2:
-                System.out.println("Please enter nickname:");
-                chooseStr = sc.next();
-                personList = personDAO.getByNickname(chooseStr);
-                for (Person gamer : personList) {
-                    System.out.println(gamer);
-                }
-            case 3:
-                System.out.println("Please enter age:");
-                chooseInt = sc.nextInt();
-                personList = personDAO.getByAge(chooseInt);
-                for (Person gamer : personList) {
-                    System.out.println(gamer);
-                }
-            default:
-                actionStatus.setParamMode(false);
+        catch (Exception e){
+            e.getMessage();
         }
+
+
     }
 
     /**
