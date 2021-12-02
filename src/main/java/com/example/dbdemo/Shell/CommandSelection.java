@@ -1,11 +1,5 @@
 package com.example.dbdemo.Shell;
 
-import com.example.dbdemo.DAO.PersonDAO;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-
-import java.sql.Connection;
-
 public class CommandSelection {
     String choose;
     public CommandSelection(String choose) {

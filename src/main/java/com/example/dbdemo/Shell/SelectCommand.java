@@ -1,8 +1,8 @@
 package com.example.dbdemo.Shell;
 
 import com.example.dbdemo.Config.ActionStatus;
-import com.example.dbdemo.DAO.PersonDAO;
-import com.example.dbdemo.DAO.PersonDAOHib;
+import com.example.dbdemo.DAO.Person.PersonDAO;
+import com.example.dbdemo.DAO.Person.PersonDAOHib;
 import com.example.dbdemo.Entity.Person;
 import com.example.dbdemo.TableInfo;
 import org.jline.utils.AttributedString;
@@ -14,7 +14,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
@@ -34,11 +33,11 @@ public class SelectCommand {
      * PersonDAO - abstract interface for working with the table of users (gamers)
      */
     Connection connection;
-    PersonDAOHib pdh = new PersonDAOHib();
     ActionStatus actionStatus;
     Scanner sc = new Scanner(System.in);
     TableInfo tableInfo;
     PersonDAO personDAO;
+    PersonDAOHib pdh;
     private static final Logger logger = Logger.getLogger(
             SelectCommand.class);
 
@@ -46,7 +45,8 @@ public class SelectCommand {
     public SelectCommand(Connection connection, ActionStatus actionStatus) {
         this.connection = connection;
         tableInfo = new TableInfo(connection);
-        personDAO = new PersonDAO(connection);
+        personDAO = new PersonDAO();
+        pdh = new PersonDAOHib();
         this.actionStatus = actionStatus;
         }
 
@@ -168,14 +168,15 @@ public class SelectCommand {
     @ShellMethod("Selection find all")
     public void findAll() {
         try {
-            List<Person> personList = personDAO.getAll();
-            for (Person gamer : personList) {
-                System.out.println(gamer);
+            List<Person> personList = pdh.getAll();
+            for (Person p : personList) {
+                System.out.println(p);
             }
             logger.info("FindAll complete");
         }
         catch (Exception e){
             e.getMessage();
+            System.out.println(e);
         }
 
     }
@@ -224,7 +225,7 @@ public class SelectCommand {
                 age=sc.nextInt();
                 System.out.println("Enter game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
                 game=sc.nextInt();
-                System.out.println(personDAO.insert(nickname,age,game));
+                System.out.println(pdh.insert(nickname,age,game));
             }
             logger.info("Insert complete");
         }
@@ -246,7 +247,7 @@ public class SelectCommand {
             if (actionStatus.getTable().equals("gamers")) {
                 System.out.println("Please enter id:");
                 id = sc.nextInt();
-                resultChecker(personDAO.delete(id),"delete");
+                resultChecker(pdh.delete(id),"delete");
             }
             logger.info("Delete complete");
         }
@@ -275,7 +276,9 @@ public class SelectCommand {
                 case 1:
                     System.out.println("Please enter id:");
                     chooseInt = sc.nextInt();
-                    System.out.println(pdh.findById(chooseInt));
+                    Person person = pdh.findById(chooseInt);
+                    System.out.println(person.toString());
+                    break;
                 case 2:
                     System.out.println("Please enter nickname:");
                     chooseStr = sc.next();
@@ -283,6 +286,7 @@ public class SelectCommand {
                     for (Person gamer : personList) {
                         System.out.println(gamer);
                     }
+                    break;
                 case 3:
                     System.out.println("Please enter age:");
                     chooseInt = sc.nextInt();
@@ -290,13 +294,14 @@ public class SelectCommand {
                     for (Person gamer : personList) {
                         System.out.println(gamer);
                     }
+                    break;
                 default:
                     actionStatus.setParamMode(false);
             }
             logger.info("Find by param complete");
         }
         catch (Exception e){
-            e.getMessage();
+            e.printStackTrace();
         }
 
 

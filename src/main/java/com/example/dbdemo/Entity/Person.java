@@ -6,18 +6,19 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table ( name = "gamers")
+@Table (name = "gamers")
+@NamedQuery(name = "Person.getAll", query = "SELECT p from Person p")
 public class Person {
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id = 0;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
     @Column(name = "nickname")
     String nickname;
     @Column(name = "age")
-    int age = 0;
+    int age;
     @Column(name = "game")
-    int game=0;
+    int game;
 
 
     @Override
