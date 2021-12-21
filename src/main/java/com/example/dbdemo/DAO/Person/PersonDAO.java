@@ -33,7 +33,7 @@ public class PersonDAO{  //ИЗБАВИТЬСЯ ОТ ДАННЫЙ БД
 
     public Person getById(int param) {
         return (Person) jdbcTemplate.queryForObject(
-                        FIND_ALL_BY_ID,
+                "SELECT * FROM gamers WHERE id = ? ",
                 new Object[]{param},
                 new BeanPropertyRowMapper(Person.class));
     }
@@ -65,7 +65,7 @@ public class PersonDAO{  //ИЗБАВИТЬСЯ ОТ ДАННЫЙ БД
 
     public List getAll() {
         List<Person> personList = jdbcTemplate.query(
-                FIND_ALL,
+                "SELECT * FROM gamers",
                 new BeanPropertyRowMapper(Person.class));
 
         return personList;

@@ -8,6 +8,10 @@ import javax.persistence.*;
 @Data
 @Table (name = "gamers")
 @NamedQuery(name = "Person.getAll", query = "SELECT p from Person p")
+@NamedQuery(name = "Person.getByNickname", query = "SELECT t FROM Person t where t.nickname = :value")
+@NamedQuery(name = "Person.getByAge", query = "SELECT t FROM Person t where t.age = :value")
+@NamedQuery(name = "Person.getByGame", query = "SELECT t FROM Person t where t.game = :value")
+@NamedQuery(name = "Person.delete", query = "DELETE FROM Person t where t.id = :value")
 public class Person {
 
     @Id

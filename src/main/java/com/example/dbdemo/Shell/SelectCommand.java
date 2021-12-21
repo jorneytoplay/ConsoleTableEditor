@@ -2,8 +2,8 @@ package com.example.dbdemo.Shell;
 
 import com.example.dbdemo.Config.ActionStatus;
 import com.example.dbdemo.DAO.Person.PersonDAO;
-import com.example.dbdemo.DAO.Person.PersonDAOHib;
 import com.example.dbdemo.Entity.Person;
+import com.example.dbdemo.Service.PersonService;
 import com.example.dbdemo.TableInfo;
 import org.jline.utils.AttributedString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import org.apache.log4j.Logger;
 
@@ -37,7 +38,7 @@ public class SelectCommand {
     Scanner sc = new Scanner(System.in);
     TableInfo tableInfo;
     PersonDAO personDAO;
-    PersonDAOHib pdh;
+    PersonService personService = new PersonService();
     private static final Logger logger = Logger.getLogger(
             SelectCommand.class);
 
@@ -46,7 +47,6 @@ public class SelectCommand {
         this.connection = connection;
         tableInfo = new TableInfo(connection);
         personDAO = new PersonDAO();
-        pdh = new PersonDAOHib();
         this.actionStatus = actionStatus;
         }
 
@@ -87,6 +87,8 @@ public class SelectCommand {
      * Restrictions on working with tables until the user selects a table
      * @return nothing if the user selected a table or warning that the table is not selected
      */
+
+
     @ShellMethodAvailability({"find-all","find-param"})
     public Availability selectAvailability() {
         return actionStatus.isTableSelect()
@@ -168,10 +170,10 @@ public class SelectCommand {
     @ShellMethod("Selection find all")
     public void findAll() {
         try {
-            List<Person> personList = pdh.getAll();
-            for (Person p : personList) {
-                System.out.println(p);
-            }
+            List<Person> personList = personService.getAll();
+           for (Person p : personList) {
+               System.out.println(p);
+           }
             logger.info("FindAll complete");
         }
         catch (Exception e){
@@ -225,7 +227,11 @@ public class SelectCommand {
                 age=sc.nextInt();
                 System.out.println("Enter game:\n1.Dota 2\n2.CS GO\n3.Hearthstone");
                 game=sc.nextInt();
-                System.out.println(pdh.insert(nickname,age,game));
+                Person person = new Person();
+                person.setNickname(nickname);
+                person.setAge(age);
+                person.setGame(game);
+               // System.out.println(personService.insert(person));
             }
             logger.info("Insert complete");
         }
@@ -246,8 +252,7 @@ public class SelectCommand {
         try {
             if (actionStatus.getTable().equals("gamers")) {
                 System.out.println("Please enter id:");
-                id = sc.nextInt();
-                resultChecker(pdh.delete(id),"delete");
+                id = sc.nextInt();resultChecker(personService.delete(id),"delete");
             }
             logger.info("Delete complete");
         }
@@ -276,13 +281,13 @@ public class SelectCommand {
                 case 1:
                     System.out.println("Please enter id:");
                     chooseInt = sc.nextInt();
-                    Person person = pdh.findById(chooseInt);
+                    Person person = personService.findById(chooseInt);
                     System.out.println(person.toString());
                     break;
                 case 2:
                     System.out.println("Please enter nickname:");
                     chooseStr = sc.next();
-                    personList = personDAO.getByNickname(chooseStr);
+                    personList = personService.getByNickname(chooseStr);
                     for (Person gamer : personList) {
                         System.out.println(gamer);
                     }
@@ -290,7 +295,7 @@ public class SelectCommand {
                 case 3:
                     System.out.println("Please enter age:");
                     chooseInt = sc.nextInt();
-                    personList = personDAO.getByAge(chooseInt);
+                    personList = personService.getByAge(chooseInt);
                     for (Person gamer : personList) {
                         System.out.println(gamer);
                     }

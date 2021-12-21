@@ -3,7 +3,7 @@
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
   http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
              version="2.1">
-<persistence-unit name="com.baeldung.movie_catalog">
+<persistence-unit name="com.baeldung.pro_gamer">
     <class>com.example.dbdemo.Entity.Person</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
